@@ -1,6 +1,8 @@
+import 'package:assessment/homescreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   double screenHeight = 0;
   double screenWidth = 0;
   Color primary = const Color(0xffeef444c);
+  late SharedPreferences sharedPreferences;
   @override
   Widget build(BuildContext context) {
     final bool isKeyboardVisible =
@@ -75,14 +78,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   customField("Enter your whatever id", idController, false),
 
                   fieldTile("Password"),
-                  customField(
-                      "Enter your password (>ᴗ•) !", passController, true),
+                  customField("Enter ur pass(>ᴗ•) !", passController, true),
                   GestureDetector(
                     //here comes our connection with the console
                     onTap: () async {
+                      FocusScope.of(context).unfocus();
                       String id = idController.text.trim();
                       String password = passController.text.trim();
-
+                      //beacons
                       if (id.isEmpty) {
                         ScaffoldMessenger.of(context)
                             .showSnackBar(const SnackBar(
@@ -98,7 +101,44 @@ class _LoginScreenState extends State<LoginScreen> {
                             .collection("Employee")
                             .where('id', isEqualTo: id)
                             .get();
-                        print(snap.docs[0]['id']);
+
+                        try {
+                          if (password == snap.docs[0]['password']) {
+                            sharedPreferences =
+                                await SharedPreferences.getInstance();
+
+                            sharedPreferences
+                                .setString('employerId', id)
+                                .then((_) {
+                              //navigating to homepage
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => HomeScreen()));
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Password is not correct"),
+                            ));
+                          }
+                        } catch (e) {
+                          String error = " ";
+
+                          if (e.toString() ==
+                              "RangeError (index): Invalid value: Valid value range is empty: 0") {
+                            setState(() {
+                              error = "Employee id does not exist";
+                            });
+                          } else {
+                            setState(() {
+                              error = "Error Ocrurred!";
+                            });
+                          }
+
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(error),
+                          ));
+                        }
                       }
                     },
                     child: Container(
@@ -112,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Center(
                           child: Text(
-                        "LOGIN✧˖°",
+                        "LOGIN✧",
                         style: TextStyle(
                           fontFamily: "RobotoBold",
                           fontSize: screenWidth / 26,
