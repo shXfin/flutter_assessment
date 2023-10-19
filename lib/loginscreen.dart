@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // go confused here by putting bot username and pass as idcontroller lol
-                  fieldTile("Your ID"),
+                  fieldTile("employeeId"),
                   customField("Enter your whatever id", idController, false),
 
                   fieldTile("Password"),
@@ -108,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 await SharedPreferences.getInstance();
 
                             sharedPreferences
-                                .setString('employerId', id)
+                                .setString('employeeId', id)
                                 .then((_) {
                               //navigating to homepage
                               Navigator.pushReplacement(

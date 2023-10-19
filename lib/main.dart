@@ -1,5 +1,6 @@
 import 'package:assessment/homescreen.dart';
 import 'package:assessment/loginscreen.dart';
+import 'package:assessment/model/user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -36,7 +37,7 @@ class AuthCheck extends StatefulWidget {
   const AuthCheck({super.key});
 
   @override
-  State<AuthCheck> createState() => _AuthCheckState();
+  _AuthCheckState createState() => _AuthCheckState();
 }
 
 class _AuthCheckState extends State<AuthCheck> {
@@ -51,8 +52,10 @@ class _AuthCheckState extends State<AuthCheck> {
     sharedPreferences = await SharedPreferences.getInstance();
 
     try {
-      if (sharedPreferences.getString("employeeId") != null) {
+      if (sharedPreferences.getString('employeeId') != null) {
         setState(() {
+          //saving id to this class here
+          User.username = sharedPreferences.getString('employeeId')!;
           userAvailable = true;
         });
       }

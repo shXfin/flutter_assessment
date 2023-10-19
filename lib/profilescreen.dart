@@ -8,11 +8,15 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  double screenHeight = 0;
+  double screenWidth = 0;
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Center(
-        child: Text("Profile"),
+        child: Text("Profile❛ᴗ❛"),
       ),
     );
   }

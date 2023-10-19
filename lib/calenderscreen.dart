@@ -8,8 +8,12 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _TodayScreenState extends State<CalendarScreen> {
+  double screenHeight = 0;
+  double screenWidth = 0;
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Center(
         child: Text("Calendar´ ▿ `"),
