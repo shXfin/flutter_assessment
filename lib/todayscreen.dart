@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:assessment/model/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +31,7 @@ class _TodayScreenState extends State<TodayScreen> {
     try {
       QuerySnapshot snap = await FirebaseFirestore.instance
           .collection("Employee")
-          .where('id', isEqualTo: User.username)
+          .where('id', isEqualTo: User.employeeId)
           .get();
 
       print(snap.docs[0].id);
@@ -38,7 +40,7 @@ class _TodayScreenState extends State<TodayScreen> {
           .collection("Employee")
           .doc(snap.docs[0].id)
           .collection("Record")
-          .doc(DateFormat('dd MMMM yyyy').format(DateTime.now()))
+          .doc('20 Octtober')
           .get();
 
       setState(() {
@@ -47,8 +49,8 @@ class _TodayScreenState extends State<TodayScreen> {
       });
     } catch (e) {
       setState(() {
-        checkIn = "--/--";
-        checkOut = "--/--";
+        checkIn = "10:11";
+        checkOut = "12:11";
       });
     }
     print(checkIn);
@@ -61,12 +63,12 @@ class _TodayScreenState extends State<TodayScreen> {
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         body: SingleChildScrollView(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           Container(
             alignment: Alignment.centerLeft,
-            margin: EdgeInsets.only(top: 32),
+            margin: const EdgeInsets.only(top: 32),
             child: Text(
               "WELCOME,",
               style: TextStyle(
@@ -79,7 +81,7 @@ class _TodayScreenState extends State<TodayScreen> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              "Employee" + User.username,
+              "Employee${User.employeeId}",
               style: TextStyle(
                 fontFamily: "RobotoBold",
                 fontSize: screenWidth / 26,
@@ -98,7 +100,7 @@ class _TodayScreenState extends State<TodayScreen> {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top: 12, bottom: 32),
+            margin: const EdgeInsets.only(top: 12, bottom: 32),
             height: 150,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -129,7 +131,8 @@ class _TodayScreenState extends State<TodayScreen> {
                         ),
                       ),
                       Text(
-                        "09:30",
+                        //check in samole
+                        checkIn, //"--/--"
                         style: TextStyle(
                           fontFamily: "RobotoBold",
                           fontSize: screenWidth / 10,
@@ -152,7 +155,8 @@ class _TodayScreenState extends State<TodayScreen> {
                         ),
                       ),
                       Text(
-                        "--/--",
+                        //check outt sample
+                        checkOut, //"09:30"
                         style: TextStyle(
                           fontFamily: "RobotoBold",
                           fontSize: screenWidth / 10,
@@ -199,67 +203,105 @@ class _TodayScreenState extends State<TodayScreen> {
                   ),
                 );
               }),
-          Container(
-            margin: EdgeInsets.only(top: 24),
-            child: Builder(builder: (context) {
-              final GlobalKey<SlideActionState> key = GlobalKey();
+          checkOut == "--/--"
+              ? Container(
+                  margin: const EdgeInsets.only(top: 24),
+                  child: Builder(
+                    builder: (context) {
+                      final GlobalKey<SlideActionState> key = GlobalKey();
 
-              return SlideAction(
-                  text: "Slide to check Out",
-                  textStyle: TextStyle(
-                    color: Colors.black54,
-                    fontSize: screenWidth / 20,
-                    fontFamily: "RobotoRegular",
+                      return SlideAction(
+                          text: checkIn == "--/--"
+                              ? "Slide to Check In"
+                              : "Slide to Check Out",
+                          textStyle: TextStyle(
+                            color: Colors.black54,
+                            fontSize: screenWidth / 20,
+                            fontFamily: "RobotoRegular",
+                          ),
+                          outerColor: Colors.white,
+                          innerColor: primary,
+                          key: key,
+                          onSubmit: () async {
+                            Timer(const Duration(seconds: 1), () {
+                              key.currentState!.reset();
+                            });
+                            print(DateFormat('hh:mm').format(DateTime.now()));
+
+                            QuerySnapshot snap = await FirebaseFirestore
+                                .instance
+                                .collection("Employee")
+                                .where('id', isEqualTo: User.employeeId)
+                                .get();
+
+                            if (snap.docs.isNotEmpty) {
+                              print(snap.docs[0].id);
+                            } else {
+                              print(
+                                  "No matching documents found for the query.");
+                            }
+                            DocumentSnapshot snap2 = await FirebaseFirestore
+                                .instance
+                                .collection("Employee")
+                                //im so done with this doc id
+                                .doc(snap.docs[0].id)
+                                .collection("Record")
+                                .doc(DateFormat('dd MMMM yyyy')
+                                    .format(DateTime.now()))
+                                .get();
+
+                            try {
+                              String checkIn = snap2['checkIn'];
+                              //for updating ui when checked iout but doesnt work for docid
+                              setState(() {
+                                checkIn =
+                                    DateFormat('hh:mm').format(DateTime.now());
+                              });
+                              await FirebaseFirestore.instance
+                                  .collection("Employee")
+                                  .doc(snap.docs[0].id)
+                                  .collection("Record")
+                                  .doc(DateFormat('dd MMMM yyyy')
+                                      .format(DateTime.now()))
+                                  .update({
+                                'checkIn': checkIn,
+                                'checkOut':
+                                    DateFormat('hh:mm').format(DateTime.now()),
+                              });
+                            } catch (e) {
+                              //for updating ui when checked in but doesnt work for docid
+                              setState(() {
+                                checkIn =
+                                    DateFormat('hh:mm').format(DateTime.now());
+                              });
+
+                              await FirebaseFirestore.instance
+                                  .collection("Employee")
+                                  .doc(snap.docs[0].id)
+                                  .collection("Record")
+                                  .doc(DateFormat('dd MMMM yyyy')
+                                      .format(DateTime.now()))
+                                  .set({
+                                'checkIn':
+                                    DateFormat('hh:mm').format(DateTime.now()),
+                              });
+                            }
+                          });
+                    },
                   ),
-                  outerColor: Colors.white,
-                  innerColor: primary,
-                  key: key,
-                  onSubmit: () async {
-                    print(DateFormat('hh:mm').format(DateTime.now()));
-
-                    QuerySnapshot snap = await FirebaseFirestore.instance
-                        .collection("Employee")
-                        .where('id', isEqualTo: User.username)
-                        .get();
-
-                    if (snap.docs.isNotEmpty) {
-                      print(snap.docs[0].id);
-                    } else {
-                      print("No matching documents found for the query.");
-                    }
-                    DocumentSnapshot snap2 = await FirebaseFirestore.instance
-                        .collection("Employee")
-                        .doc(snap.docs[0].id)
-                        .collection("Record")
-                        .doc(DateFormat('dd MMMM yyyy').format(DateTime.now()))
-                        .get();
-
-                    try {
-                      String checkIn = snap2['checkIn'];
-                      await FirebaseFirestore.instance
-                          .collection("Employee")
-                          .doc(snap.docs[0].id)
-                          .collection("Record")
-                          .doc(
-                              DateFormat('dd MMMM yyyy').format(DateTime.now()))
-                          .update({
-                        'checkIn': checkIn,
-                        'checkOut': DateFormat('hh:mm').format(DateTime.now()),
-                      });
-                    } catch (e) {
-                      await FirebaseFirestore.instance
-                          .collection("Employee")
-                          .doc(snap.docs[0].id)
-                          .collection("Record")
-                          .doc(
-                              DateFormat('dd MMMM yyyy').format(DateTime.now()))
-                          .set({
-                        'checkIn': DateFormat('hh:mm').format(DateTime.now()),
-                      });
-                    }
-                  });
-            }),
-          ),
+                )
+              : Container(
+                  //doesnt work
+                  margin: const EdgeInsets.only(top: 32),
+                  child: Text(
+                    "You have completed this day!",
+                    style: TextStyle(
+                      fontFamily: "RobotoRegular",
+                      fontSize: screenWidth / 20,
+                      color: Colors.black54,
+                    ),
+                  ),
+                )
         ],
       ),
     ));

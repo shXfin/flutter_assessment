@@ -42,6 +42,7 @@ dependencies:
   font_awesome_flutter: ^10.6.0
   slide_to_act: ^2.0.2
   intl: ^0.18.1
+  month_year_picker: ^0.3.0+1
 
 dev_dependencies:
   flutter_test:

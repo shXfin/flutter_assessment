@@ -114,10 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => HomeScreen()));
+                                      builder: (context) => const HomeScreen()));
                             });
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                               content: Text("Password is not correct"),
                             ));
                           }
@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget fieldTile(String title) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
         style: TextStyle(
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       width: screenWidth,
       margin: EdgeInsets.only(bottom: screenHeight / 26),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(Radius.circular(12)),
         boxShadow: [
@@ -201,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: screenWidth / 8,
             child: Icon(
               Icons.person,

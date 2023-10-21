@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: KeyboardVisibilityProvider(
+      home: const KeyboardVisibilityProvider(
         child: AuthCheck(),
       ),
     );
@@ -55,7 +55,7 @@ class _AuthCheckState extends State<AuthCheck> {
       if (sharedPreferences.getString('employeeId') != null) {
         setState(() {
           //saving id to this class here
-          User.username = sharedPreferences.getString('employeeId')!;
+          User.employeeId = sharedPreferences.getString('employeeId')!;
           userAvailable = true;
         });
       }
@@ -68,6 +68,6 @@ class _AuthCheckState extends State<AuthCheck> {
 
   @override
   Widget build(BuildContext context) {
-    return userAvailable ? HomeScreen() : LoginScreen();
+    return userAvailable ? const HomeScreen() : const LoginScreen();
   }
 }

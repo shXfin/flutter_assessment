@@ -1,6 +1,8 @@
 import 'package:assessment/calenderscreen.dart';
+import 'package:assessment/model/user.dart';
 import 'package:assessment/profilescreen.dart';
 import 'package:assessment/todayscreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -14,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   double screenHeight = 0;
   double screenWidth = 0;
+  String id = '';
   Color primary = const Color(0xffeef444c);
   int currentIndex = 1;
 
@@ -23,13 +26,30 @@ class _HomeScreenState extends State<HomeScreen> {
     FontAwesomeIcons.user,
   ];
   @override
+  void initState() {
+    super.initState();
+    getId();
+  }
+
+  void getId() async {
+    QuerySnapshot snap = await FirebaseFirestore.instance
+        .collection("Employee")
+        .where('id', isEqualTo: User.employeeId)
+        .get();
+
+    //   setState(() {
+    //   User.id = snap.docs[0].id;
+    //   });
+  }
+
+  @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: IndexedStack(
         index: currentIndex,
-        children: [
+        children: const [
           CalendarScreen(),
           TodayScreen(),
           ProfileScreen(),
@@ -37,12 +57,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: Container(
         height: 70,
-        margin: EdgeInsets.only(
+        margin: const EdgeInsets.only(
           left: 12,
           right: 12,
           bottom: 24,
         ),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(40)),
           boxShadow: [
@@ -54,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(40)),
+          borderRadius: const BorderRadius.all(Radius.circular(40)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -83,12 +103,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             i == currentIndex
                                 ? Container(
-                                    margin: EdgeInsets.only(top: 6),
+                                    margin: const EdgeInsets.only(top: 6),
                                     height: 3,
                                     width: 22,
                                     decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(40)),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(40)),
                                       color: primary,
                                     ),
                                   )
